@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-html="htmlSafe"></div>
+        <div :id="`content-${id}`" v-html="htmlSafe"></div>
         <author-bar
             v-if="showAuthorBar"
             v-bind="author"
@@ -37,6 +37,7 @@
 import Vue from "vue"
 import "streams/app/components/AuthorBar.vue"
 import "streams/app/components/ReactionsBar.vue"
+import "streams/app/components/NsfwShield.vue"
 import store from "streams/app/stores/applicationStore"
 
 
@@ -57,6 +58,11 @@ export default Vue.component("stream-element", {
         showAuthorBar: {type: Boolean, required: true},
         hasShared: {type: Boolean, required: true},
     },
+    data(){
+        return {
+            nsfwShield: null
+        }
+    },
     computed: {
         editedText() {
             return this.edited ? " (edited)" : ""
@@ -67,6 +73,9 @@ export default Vue.component("stream-element", {
         updateUrl() {
             return Urls["content:update"]({pk: this.id})
         },
+    },
+    mounted(){
+        this.nsfwShield = new Vue({el: `#content-${this.id}`})
     },
     updated() {
         Vue.redrawVueMasonry()

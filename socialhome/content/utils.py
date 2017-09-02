@@ -65,11 +65,7 @@ def make_nsfw_safe(text):
     images = soup.find_all("img")
 
     for image in images:
-        if image.get("class"):
-            image["class"] = "%s nsfw" % " ".join(image.get("class"))
-        else:
-            image["class"] = "nsfw"
-        image.replace_with(image)
+        image.wrap(soup.new_tag("nsfw-shield"))
 
     result = str(soup)
     # We don't want html/body, which BeautifulSoup kindly wraps our new HTML in
