@@ -21,7 +21,6 @@
             <div class="gutter-sizer"></div>
             <stream-element
                 class="grid-item"
-                @loadmore="loadStream"
                 v-masonry-tile
                 v-for="content in $store.getters.contentList"
                 :content="content"
@@ -38,6 +37,7 @@ import Vue from "vue"
 import VueScrollTo from "vue-scrollto"
 
 import {streamStoreOperations} from "frontend/stores/streamStore"
+import loadStreamMixin from "frontend/mixins/loadStreamMixin"
 
 import "frontend/components/streams/StreamElement.vue"
 import PublicStampedElement from "frontend/components/streams/stamped_elements/PublicStampedElement.vue"
@@ -58,6 +58,7 @@ export default Vue.component("stream", {
         tag: {type: String, default: ""},
     },
     components: {FollowedStampedElement, PublicStampedElement, ProfileStampedElement, TagStampedElement},
+    mixins: [loadStreamMixin],
     data() {
         return {
             masonryOptions: {
@@ -109,38 +110,6 @@ export default Vue.component("stream", {
             this.$store.dispatch(streamStoreOperations.newContentAck).then(
                 () => this.$nextTick( // Wait for new content to be rendered
                     () => this.$scrollTo("body")))
-        },
-        loadStream() {
-            const options = {params: {}}
-            const lastContentId = this.$store.state.contentIds[this.$store.state.contentIds.length - 1]
-            if (lastContentId && this.$store.state.contents[lastContentId]) {
-                options.params.lastId = this.$store.state.contents[lastContentId].through
-            }
-
-            switch (this.$store.state.stream.name) {
-                case "followed":
-                    this.$store.dispatch(streamStoreOperations.getFollowedStream, options)
-                    break
-                case "public":
-                    this.$store.dispatch(streamStoreOperations.getPublicStream, options)
-                    break
-                case "tag":
-                    options.params.name = this.tag
-                    this.$store.dispatch(streamStoreOperations.getTagStream, options)
-                    break
-                case "profile_all":
-                    // TODO: Replace this with guid property when API has evolved to support guid
-                    options.params.id = this.$store.state.applicationStore.profile.id
-                    this.$store.dispatch(streamStoreOperations.getProfileAll, options)
-                    break
-                case "profile_pinned":
-                    // TODO: Replace this with guid property when API has evolved to support guid
-                    options.params.id = this.$store.state.applicationStore.profile.id
-                    this.$store.dispatch(streamStoreOperations.getProfilePinned, options)
-                    break
-                default:
-                    break
-            }
         },
     },
     beforeMount() {

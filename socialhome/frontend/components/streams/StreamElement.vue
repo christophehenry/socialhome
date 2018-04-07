@@ -35,6 +35,7 @@ import Vue from "vue"
 import imagesLoaded from "vue-images-loaded"
 
 import {streamStoreOperations} from "frontend/stores/streamStore.operations"
+import loadStreamMixin from "frontend/mixins/loadStreamMixin"
 import "frontend/components/streams/AuthorBar.vue"
 import "frontend/components/streams/ReactionsBar.vue"
 import "frontend/components/streams/NsfwShield.vue"
@@ -45,6 +46,7 @@ export default Vue.component("stream-element", {
     props: {
         content: {type: Object, required: true},
     },
+    mixins: [loadStreamMixin],
     computed: {
         deleteUrl() {
             return Urls["content:delete"]({pk: this.content.id})
@@ -101,7 +103,7 @@ export default Vue.component("stream-element", {
         },
         loadMore() {
             this.$store.dispatch(streamStoreOperations.disableLoadMore, this.content.id)
-            this.$emit("loadmore")
+            this.loadStream()
         },
         onImageLoad() {
             if (!this.$store.state.stream.single) {

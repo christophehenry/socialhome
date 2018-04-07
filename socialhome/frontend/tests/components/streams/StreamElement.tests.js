@@ -68,10 +68,10 @@ describe("StreamElement", () => {
         it("loadMore dispatches stream operations", () => {
             const target = mount(StreamElement, {propsData: {content: store.content}, store})
             Sinon.spy(target.instance().$store, "dispatch")
-            Sinon.spy(target.instance(), "$emit")
+            Sinon.spy(target.instance(), "loadStream")
             target.instance().loadMore()
             target.instance().$store.dispatch.getCall(0).args[0].should.eql(streamStoreOperations.disableLoadMore)
-            target.instance().$emit.getCall(0).args[0].should.eql("loadmore")
+            target.instance().loadStream.calledOnce.should.be.true
         })
 
         describe("onImageLoad", () => {
